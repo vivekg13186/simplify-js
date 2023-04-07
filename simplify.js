@@ -1,5 +1,5 @@
 const CODE_REGEXP = /\".*?\"/gm;
-const RULE_REGEXP = /\$\{.*?\}/gm;
+const RULE_REGEXP = /\{.*?\}/gm;
 
 class Simplify {
 
@@ -11,7 +11,7 @@ class Simplify {
         if(!this.rules[hash]){
             this.rules[hash] = {string_pattern:string_pattern,args : this._get_rule_params(string_pattern),callback :callback };
         }else{
-            console.warn(string_pattern," similar pattern is aleady registered");
+            console.warn(string_pattern," similar pattern is already registered");
         }   
     }
 
@@ -26,10 +26,10 @@ class Simplify {
                if(this.rules[hash]){
                 this.rules[hash].callback(args);
                }else{
-                throw "New rule found for : "+l;
+                throw "No rule found for : "+l;
                }
             }catch(e){
-                console.error("Error at line ",lno," : ",l," error ",e);
+                console.error("Error at line ",lno," : ",l,"\nError message : ",e);
             }
 
         }
@@ -37,19 +37,21 @@ class Simplify {
         
     }
     _get_rule_params(rule) {
-        var p = rule.match(reg_param) || [];
+        var p = rule.match(RULE_REGEXP) || [];
         p = p.map(s => s.substring(2, s.length - 1));
         return p;
     }
     _get_code_value(rule) {
-        var p = rule.match(reg_code) || [];
+        var p = rule.match(CODE_REGEXP) || [];
         p = p.map(s => s.substring(1, s.length - 1));
         return p;
     }
     _get_hash_rule(rule) {
-        return rule.replaceAll(reg_param, "*");
+        return rule.replaceAll(RULE_REGEXP, "*");
     }
     _get_hash_code(rule) {
-        return rule.replaceAll(reg_code, "*");
+        return rule.replaceAll(CODE_REGEXP, "*");
     }
 }
+
+exports.Simplify =Simplify;
